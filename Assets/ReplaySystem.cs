@@ -1,33 +1,43 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityStandardAssets.CrossPlatformInput;
 
 public class ReplaySystem : MonoBehaviour {
     private const int bufferFrame = 100;
     private MyKeyFrame[] keyFrames = new MyKeyFrame[bufferFrame];
     private Rigidbody rigid;
-	// Use this for initialization
-	void Start () {
+    private GameManager gameManager;
+
+    // Use this for initialization
+    void Start () {
         rigid = GetComponent<Rigidbody>();
+        gameManager = GameObject.FindObjectOfType<GameManager>();
 	}
 
+
+    // Update is called once per frame
+    void Update () {
+        if (gameManager.recording) {
+            Record();
+        }
+        else {
+            PlayBack();
+        }
+    }
     private void Record() {
+        //rigid.isKinematic = false;
         int frame = Time.frameCount % bufferFrame;
         float time = Time.time;
         print("Writing frame: " + frame);
         keyFrames[frame] = new MyKeyFrame(time, transform.position, transform.rotation);
     }
     private void PlayBack() {
-        rigid.isKinematic = true;
+       // rigid.isKinematic = true;
         int frame = Time.frameCount % bufferFrame;
-        print("Reading frame: " + frame);
+        //print("Reading frame: " + frame);
         transform.position = keyFrames[frame].pos;
         transform.rotation = keyFrames[frame].rot;
-    }
-    // Update is called once per frame
-    void Update () {
-        Record();
-        PlayBack();
     }
 }
 
